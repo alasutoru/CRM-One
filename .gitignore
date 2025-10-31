@@ -1,0 +1,19 @@
+# Python / Django 忽略項目
+# 忽略所有虛擬環境
+venv/
+*.pyc
+__pycache__/
+.env
+db.sqlite3
+
+# Django 專用
+/backend/crm_project/settings/local.py # 如果您未來創建了本地敏感配置
+/backend/media/
+
+# Node / Vue.js 忽略項目
+/frontend/node_modules
+/frontend/dist
+
+# VS Code 忽略
+.vscode/
+.DS_Store
