@@ -1,0 +1,42 @@
+# .github/workflows/django_test.yml
+
+name: Django CI/CD Test (Backend)
+
+# 設定在什麼情況下運行這個 workflow
+on:
+  push:
+    branches: [ "main", "develop" ] # 當程式碼推送到 main 或 develop 分支時運行
+  pull_request:
+    branches: [ "main", "develop" ] # 當有人提交 PR 到 main 或 develop 時運行
+
+jobs:
+  test:
+    # 在 Ubuntu 虛擬機上運行
+    runs-on: ubuntu-latest
+
+    # 設定矩陣：用 Python 3.10 和 3.11 測試，確保兼容性
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11"]
+
+    steps:
+    - uses: actions/checkout@v4 # 步驟 1: 獲取 GitHub 倉庫程式碼
+
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ matrix.python-version }} # 步驟 2: 安裝指定的 Python 版本
+
+    - name: Install Dependencies
+      run: |
+        # 步驟 3: 安裝依賴 (從 requirements.txt 讀取)
+        python -m pip install --upgrade pip
+        pip install -r backend/requirements.txt # 注意路徑！
+
+    - name: Run Tests
+      working-directory: ./backend # 步驟 4: 進入 backend 目錄
+      run: |
+        # 執行 Django 系統檢查和單元測試
+        # GitHub Actions 預設的 python 指令通常指向 python3
+        python manage.py check 
+        python manage.py test
