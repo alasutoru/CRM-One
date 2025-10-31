@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_filters',
     'rest_framework',
     'customers',
 ]
@@ -122,3 +124,27 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# DRF 全局設置，啟用過濾後端
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': (
+        'django_filters.rest_framework.DjangoFilterBackend', # 這裡也是 django_filters
+    ),
+    # 【新增】設置 API 的默認身份驗證方式為 JWT
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+SIMPLE_JWT = {
+    # 設置訪問 Token 的有效期為 5 分鐘
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    # 設置刷新 Token 的有效期為 1 天
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True, # 啟用刷新 Token 旋轉 (提高安全性)
+    'BLACKLIST_AFTER_ROTATION': True, # 刷新後，舊的 Token 立即失效
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': 'django-insecure-m+p!b=h&y8-j!&i&g-76x@6s_e7q1e6t3(1$v-e6_u+c277*b(3', # 這裡應該使用 settings.SECRET_KEY 
+    'AUTH_HEADER_TYPES': ('Bearer',), # API 請求頭中使用 'Authorization: Bearer <Token>'
+}
